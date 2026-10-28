@@ -1,0 +1,51 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Search } from 'lucide-react'
+import { students } from '../data/students'
+
+export default function Students() {
+  const [query, setQuery] = useState('')
+
+  const filtered = students.filter((s) =>
+    s.name.toLowerCase().includes(query.toLowerCase())
+  )
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold">Students</h1>
+      <p className="mt-1 text-slate-500">{students.length} students enrolled</p>
+
+      <div className="mt-6 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+        <Search size={18} className="text-slate-400" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search students..."
+          className="w-full bg-transparent text-sm outline-none"
+        />
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {filtered.map((s) => (
+          <Link
+            key={s.id}
+            to={`/students/${s.id}`}
+            className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm transition hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-600">
+              {s.name.split(' ').map((n) => n[0]).join('')}
+            </div>
+            <div>
+              <p className="font-semibold">{s.name}</p>
+              <p className="text-sm text-slate-500">{s.batch}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="mt-6 text-slate-500">No students match your search.</p>
+      )}
+    </div>
+  )
+}
