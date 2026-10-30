@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CheckCircle2, ChevronDown, Clock, Wallet } from 'lucide-react'
+import { CheckCircle2, ChevronDown, Clock, MessageCircle, Wallet } from 'lucide-react'
 import { students } from '../data/students'
 import { initialPayments } from '../data/payments'
 
@@ -22,7 +22,22 @@ function summarize(record) {
   const pending = sum('Pending')
   return { paid, pending, status: pending === 0 ? 'Completed' : 'Pending' }
 }
+const DEFAULT_TEMPLATE =
+  'Hello {name}, this is a gentle reminder from XYZ Coaching. Your fee of {amount} ({label}) was due on {due}. Kindly pay at the earliest. Thank you!'
 
+function waLink(phone, text) {
+  const digits = phone.replace(/\D/g, '')
+  const number = digits.length === 10 ? '91' + digits : digits
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`
+}
+
+function buildMessage(template, name, amount, label, due) {
+  return template
+    .replace('{name}', name.split(' ')[0])
+    .replace('{amount}', amount)
+    .replace('{label}', label)
+    .replace('{due}', due)
+}
 export default function Payments() {
   const [payments, setPayments] = useState(() => {
     try {
@@ -32,6 +47,13 @@ export default function Payments() {
       return initialPayments
     }
   })
+  const [template, setTemplate] = useState(
+  () => localStorage.getItem('fee-template') || DEFAULT_TEMPLATE
+)
+
+useEffect(() => {
+  localStorage.setItem('fee-template', template)
+}, [template])
   const [filter, setFilter] = useState('All')
   const [openId, setOpenId] = useState(null)
 
@@ -98,7 +120,21 @@ export default function Payments() {
           </div>
         ))}
       </div>
-
+      <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+        <p className="text-sm font-semibold">WhatsApp reminder message</p>
+        <textarea
+          value={template}
+          onChange={(e) => setTemplate(e.target.value)}
+          rows={3}
+          className="mt-2 w-full resize-none rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-indigo-400"
+        />
+        <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
+          <span>Use {'{name}'}, {'{amount}'}, {'{label}'} and {'{due}'}</span>
+          <button onClick={() => setTemplate(DEFAULT_TEMPLATE)} className="text-indigo-600 hover:underline">
+            Reset
+          </button>
+        </div>
+      </div>
       <div className="mt-6 space-y-3">
         {visible.map((r) => {
           const open = openId === r.studentId
@@ -147,14 +183,28 @@ export default function Payments() {
                           <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${badge[i.status]}`}>
                             {i.status}
                           </span>
-                          {i.status === 'Pending' && (
-                            <button
-                              onClick={() => markPaid(r.studentId, i.id)}
-                              className="rounded-lg bg-gold-400 px-3 py-1 text-xs font-medium text-navy-900 hover:bg-gold-300"
-                            >
-                              Mark paid
-                            </button>
-                          )}
+                         {i.status === 'Pending' && (
+  <>
+    <a
+      href={waLink(
+        r.student.phone,
+        buildMessage(template, r.student.name, inr(i.amount), i.label, i.dueDate)
+      )}
+      target="_blank"
+      rel="noreferrer"
+      className="flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-600"
+    >
+      <MessageCircle size={12} /> Remind
+    </a>
+    <button
+      onClick={() => markPaid(r.studentId, i.id)}
+      className="rounded-lg bg-gold-400 px-3 py-1 text-xs font-medium text-navy-900 hover:bg-gold-300"
+    >
+      Mark paid
+    </button>
+  </>
+)}
+                          
                         </div>
                       </div>
                     ))}
