@@ -9,7 +9,8 @@ import Tests from './pages/Tests'
 import Results from './pages/Results'
 import Queries from './pages/Queries'
 import TakeTest from './pages/TakeTest'
-
+import Payments from './pages/Payments'
+import About from './pages/About'
 export default function App() {
   return (
     <Routes>
@@ -22,6 +23,8 @@ export default function App() {
         <Route path="/results" element={<Results />} />
         <Route path="/queries" element={<Queries />} />
         <Route path="/tests/:id" element={<TakeTest />} />
+        <Route path="/payments" element={<Payments />} />
+        <Route path="/about" element={<About />} />
       </Route>
     </Routes>
   )

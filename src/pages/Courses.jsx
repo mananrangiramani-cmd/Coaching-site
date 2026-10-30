@@ -57,7 +57,7 @@ export default function Courses() {
               </div>
               <div className="mt-1 h-2 rounded-full bg-slate-100">
                 <div
-                  className="h-2 rounded-full bg-indigo-500"
+                  className="h-2 rounded-full bg-gold-400"
                   style={{ width: `${c.progress}%` }}
                 />
               </div>

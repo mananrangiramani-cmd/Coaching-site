@@ -5,8 +5,6 @@ import { tests } from '../data/tests'
 import { useUser } from '../context/UserContext'
 
 export default function Results() {
-  const { id } = useParams()
-  const navigate = useNavigate()
   const { currentUser } = useUser()
   const [results, setResults] = useState(() =>
     JSON.parse(localStorage.getItem('results') || '[]')

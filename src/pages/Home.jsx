@@ -30,19 +30,19 @@ export default function Home() {
   return (
     <div className="space-y-12">
       {/* Hero */}
-      <section className="rounded-3xl bg-slate-900 p-8 text-white sm:p-12">
-        <p className="text-sm font-medium text-indigo-300">Welcome to DLPT</p>
+            <section className="rounded-3xl bg-navy-900 p-8 text-snow sm:p-12">
+        <p className="text-sm font-medium text-gold-400">Welcome to DLPT Coaching</p>
         <h1 className="mt-2 max-w-xl text-3xl font-bold leading-tight sm:text-4xl">
           Learn smarter. Score higher. Grow together.
         </h1>
-        <p className="mt-3 max-w-lg text-slate-300">
+        <p className="mt-3 max-w-lg text-blue-100/80">
           Expert faculty, regular tests and a community where every doubt gets answered.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link to="/courses" className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100">
+          <Link to="/courses" className="flex items-center gap-2 rounded-xl bg-gold-400 px-5 py-2.5 text-sm font-medium text-navy-900 hover:bg-gold-300">
             Explore courses <ArrowRight size={16} />
           </Link>
-          <Link to="/tests" className="rounded-xl border border-white/30 px-5 py-2.5 text-sm font-medium hover:bg-white/10">
+          <Link to="/tests" className="rounded-xl border border-snow/30 px-5 py-2.5 text-sm font-medium hover:bg-snow/10">
             Take a test
           </Link>
         </div>

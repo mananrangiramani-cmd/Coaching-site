@@ -91,7 +91,7 @@ export default function TakeTest() {
 
       <button
         onClick={submit}
-        className="mt-6 rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700"
+        className="mt-6 rounded-xl bg-gold-400 text-navy-900 hover:bg-gold-300"
       >
         Submit test
       </button>
