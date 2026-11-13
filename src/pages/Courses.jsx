@@ -1,39 +1,50 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Clock, PlayCircle } from 'lucide-react'
 import { courses } from '../data/courses'
-
-const categories = ['All', 'JEE', 'NEET', 'Foundation']
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+import StandardSelect from '../components/StandardSelect'
 
 export default function Courses() {
+  const { standard } = useUser()
   const [category, setCategory] = useState('All')
 
-  const visible =
-    category === 'All' ? courses : courses.filter((c) => c.category === category)
+  // only courses that are offered to this class
+  const forClass = courses.filter((c) => c.standards.includes(standard))
+  const categories = ['All', ...new Set(forClass.map((c) => c.category))]
+  const active = categories.includes(category) ? category : 'All'
+  const visible = active === 'All' ? forClass : forClass.filter((c) => c.category === active)
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Courses</h1>
-      <p className="mt-1 text-slate-500">Pick a course and keep learning.</p>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setCategory(cat)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              category === cat
-                ? 'bg-slate-900 text-white'
-                : 'bg-white text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Courses</h1>
+          <p className="mt-1 text-slate-500">Courses for Class {ordinal(standard)}.</p>
+        </div>
+        <StandardSelect />
       </div>
+
+      {categories.length > 2 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                active === cat ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {visible.map((c) => (
-          <div key={c.id} className="rounded-2xl bg-white p-5 shadow-sm">
+          <Link key={c.id} to={`/courses/${c.id}`} className="block rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md">
             <div className="flex items-center justify-between">
               <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-600">
                 {c.category}
@@ -56,13 +67,11 @@ export default function Courses() {
                 <span>{c.progress}%</span>
               </div>
               <div className="mt-1 h-2 rounded-full bg-slate-100">
-                <div
-                  className="h-2 rounded-full bg-gold-400"
-                  style={{ width: `${c.progress}%` }}
-                />
+                <div className="h-2 rounded-full bg-gold-400" style={{ width: `${c.progress}%` }} />
               </div>
             </div>
-          </div>
+            <p className="mt-4 text-sm font-medium text-indigo-600">Open course →</p>
+          </Link>
         ))}
       </div>
     </div>

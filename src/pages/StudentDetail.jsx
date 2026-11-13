@@ -1,7 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Lock } from 'lucide-react'
 import { students } from '../data/students'
 import { initialDoubts } from '../data/doubts'
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
 
 function load(key, fallback) {
   try {
@@ -22,9 +24,11 @@ function initials(name) {
 
 export default function StudentDetail() {
   const { id } = useParams()
+  const { isAdmin, currentUser, standard } = useUser()
   const student = students.find((s) => s.id === Number(id))
 
-  if (!student) {
+  // a student cannot open profiles from another class
+  if (!student || (!isAdmin && student.standard !== standard)) {
     return (
       <div>
         <p>Student not found.</p>
@@ -33,8 +37,44 @@ export default function StudentDetail() {
     )
   }
 
+  // scores, contact details and test history are private to the student and the admin
+  const canSeeDetails = isAdmin || student.name === currentUser
+
+  const header = (
+    <>
+      <div className="flex items-center gap-4">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-xl font-semibold text-indigo-600">
+          {initials(student.name)}
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold">{student.name}</h1>
+          <p className="text-slate-500">
+            Class {ordinal(student.standard)} · {student.batch} · {student.course}
+          </p>
+        </div>
+      </div>
+      <p className="mt-4 text-slate-600">{student.about}</p>
+    </>
+  )
+
+  if (!canSeeDetails) {
+    return (
+      <div className="space-y-6">
+        <Link to="/students" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-indigo-600">
+          <ArrowLeft size={16} /> Back to students
+        </Link>
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          {header}
+          <div className="mt-6 flex items-center gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+            <Lock size={16} /> Scores and test history are private to each student.
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const results = load('results', []).filter((r) => r.student === student.name)
-  const doubts = load('doubts-v2', initialDoubts)
+  const doubts = load('doubts-v3', initialDoubts)
   const asked = doubts.filter((d) => d.author === student.name).length
   const myReplies = doubts.flatMap((d) => d.replies).filter((r) => r.author === student.name)
   const solvedForOthers = myReplies.filter((r) => r.accepted).length
@@ -63,17 +103,7 @@ export default function StudentDetail() {
       </Link>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-xl font-semibold text-indigo-600">
-            {initials(student.name)}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{student.name}</h1>
-            <p className="text-slate-500">{student.batch} · {student.course}</p>
-          </div>
-        </div>
-
-        <p className="mt-4 text-slate-600">{student.about}</p>
+        {header}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           {stats.map((st) => (

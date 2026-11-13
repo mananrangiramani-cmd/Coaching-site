@@ -3,6 +3,9 @@ import { ArrowRight, Award, BookOpen, GraduationCap, Trophy, Users } from 'lucid
 import { students } from '../data/students'
 import { courses } from '../data/courses'
 import { faculty, achievements } from '../data/home'
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+import StandardSelect from '../components/StandardSelect'
 
 const medalColors = ['bg-amber-100 text-amber-600', 'bg-slate-200 text-slate-600', 'bg-orange-100 text-orange-600']
 
@@ -18,11 +21,16 @@ function initials(name) {
 }
 
 export default function Home() {
-  const topPerformers = [...students].sort((a, b) => b.avgScore - a.avgScore).slice(0, 3)
+  const { standard } = useUser()
+
+  // top performers and counts are for one class only
+  const classmates = students.filter((s) => s.standard === standard)
+  const topPerformers = [...classmates].sort((a, b) => b.avgScore - a.avgScore).slice(0, 3)
+  const classCourses = courses.filter((c) => c.standards.includes(standard))
 
   const stats = [
-    { label: 'Students', value: `${students.length}+`, icon: Users },
-    { label: 'Courses', value: courses.length, icon: BookOpen },
+    { label: `Students in Class ${ordinal(standard)}`, value: classmates.length, icon: Users },
+    { label: `Courses in Class ${ordinal(standard)}`, value: classCourses.length, icon: BookOpen },
     { label: 'Expert faculty', value: faculty.length, icon: GraduationCap },
     { label: 'Achievements', value: achievements.length, icon: Award },
   ]
@@ -30,7 +38,7 @@ export default function Home() {
   return (
     <div className="space-y-12">
       {/* Hero */}
-            <section className="rounded-3xl bg-navy-900 p-8 text-snow sm:p-12">
+      <section className="rounded-3xl bg-navy-900 p-8 text-snow sm:p-12">
         <p className="text-sm font-medium text-gold-400">Welcome to XYZ Coaching</p>
         <h1 className="mt-2 max-w-xl text-3xl font-bold leading-tight sm:text-4xl">
           Learn smarter. Score higher. Grow together.
@@ -61,11 +69,14 @@ export default function Home() {
 
       {/* Top performers */}
       <section>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-2xl font-bold">
             <Trophy className="text-amber-500" /> Top performers
           </h2>
-          <Link to="/students" className="text-sm font-medium text-indigo-600">View all</Link>
+          <div className="flex items-center gap-4">
+            <StandardSelect />
+            <Link to="/students" className="text-sm font-medium text-indigo-600">View all</Link>
+          </div>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {topPerformers.map((s, i) => (

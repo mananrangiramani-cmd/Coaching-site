@@ -9,7 +9,8 @@ const subjectColors = {
   Other: 'bg-slate-100 text-slate-600',
 }
 
-export default function DoubtCard({ doubt, currentUser, onUpvote, onReply, onAccept }) {
+// readOnly is used for the admin: they can see everything but not post or answer.
+export default function DoubtCard({ doubt, currentUser, readOnly = false, onUpvote, onReply, onAccept }) {
   const [showReplies, setShowReplies] = useState(false)
   const [replyText, setReplyText] = useState('')
 
@@ -45,7 +46,8 @@ export default function DoubtCard({ doubt, currentUser, onUpvote, onReply, onAcc
       <div className="mt-4 flex items-center gap-4 text-sm">
         <button
           onClick={() => onUpvote(doubt.id)}
-          className="flex items-center gap-1 text-slate-500 hover:text-indigo-600"
+          disabled={readOnly}
+          className="flex items-center gap-1 text-slate-500 enabled:hover:text-indigo-600"
         >
           <ArrowBigUp size={18} /> {doubt.upvotes}
         </button>
@@ -88,18 +90,21 @@ export default function DoubtCard({ doubt, currentUser, onUpvote, onReply, onAcc
               )}
             </div>
           ))}
+          {doubt.replies.length === 0 && <p className="text-sm text-slate-500">No answers yet.</p>}
 
-          <form onSubmit={handleReply} className="flex gap-2">
-            <input
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Write an answer..."
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-400"
-            />
-            <button className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-              Answer
-            </button>
-          </form>
+          {!readOnly && (
+            <form onSubmit={handleReply} className="flex gap-2">
+              <input
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Write an answer..."
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-400"
+              />
+              <button className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                Answer
+              </button>
+            </form>
+          )}
         </div>
       )}
     </div>

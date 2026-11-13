@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { CheckCircle2, ChevronDown, Clock, MessageCircle, Wallet } from 'lucide-react'
 import { students } from '../data/students'
 import { initialPayments } from '../data/payments'
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+import StandardSelect from '../components/StandardSelect'
 
 const inr = (n) => '₹' + n.toLocaleString('en-IN')
 
@@ -11,17 +14,6 @@ const badge = {
   Pending: 'bg-amber-100 text-amber-600',
 }
 
-function initials(name) {
-  return name.split(' ').map((n) => n[0]).join('')
-}
-
-function summarize(record) {
-  const sum = (status) =>
-    record.installments.filter((i) => i.status === status).reduce((s, i) => s + i.amount, 0)
-  const paid = sum('Paid')
-  const pending = sum('Pending')
-  return { paid, pending, status: pending === 0 ? 'Completed' : 'Pending' }
-}
 const DEFAULT_TEMPLATE =
   'Hello {name}, this is a gentle reminder from XYZ Coaching. Your fee of {amount} ({label}) was due on {due}. Kindly pay at the earliest. Thank you!'
 
@@ -38,7 +30,21 @@ function buildMessage(template, name, amount, label, due) {
     .replace('{label}', label)
     .replace('{due}', due)
 }
+
+function initials(name) {
+  return name.split(' ').map((n) => n[0]).join('')
+}
+
+function summarize(record) {
+  const sum = (status) =>
+    record.installments.filter((i) => i.status === status).reduce((s, i) => s + i.amount, 0)
+  const paid = sum('Paid')
+  const pending = sum('Pending')
+  return { paid, pending, status: pending === 0 ? 'Completed' : 'Pending' }
+}
+
 export default function Payments() {
+  const { standard } = useUser()
   const [payments, setPayments] = useState(() => {
     try {
       const saved = localStorage.getItem('payments-v1')
@@ -47,19 +53,19 @@ export default function Payments() {
       return initialPayments
     }
   })
-  const [template, setTemplate] = useState(
-  () => localStorage.getItem('fee-template') || DEFAULT_TEMPLATE
-)
-
-useEffect(() => {
-  localStorage.setItem('fee-template', template)
-}, [template])
   const [filter, setFilter] = useState('All')
   const [openId, setOpenId] = useState(null)
+  const [template, setTemplate] = useState(
+    () => localStorage.getItem('fee-template') || DEFAULT_TEMPLATE
+  )
 
   useEffect(() => {
     localStorage.setItem('payments-v1', JSON.stringify(payments))
   }, [payments])
+
+  useEffect(() => {
+    localStorage.setItem('fee-template', template)
+  }, [template])
 
   function markPaid(studentId, installmentId) {
     setPayments(
@@ -78,9 +84,10 @@ useEffect(() => {
     )
   }
 
+  // only students of the selected class, then the Completed/Pending filter
   const rows = payments
     .map((p) => ({ ...p, student: students.find((s) => s.id === p.studentId), ...summarize(p) }))
-    .filter((r) => r.student)
+    .filter((r) => r.student && r.student.standard === standard)
 
   const visible = filter === 'All' ? rows : rows.filter((r) => r.status === filter)
 
@@ -95,20 +102,23 @@ useEffect(() => {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Payments</h1>
-          <p className="mt-1 text-slate-500">Admin view of fee payments.</p>
+          <p className="mt-1 text-slate-500">Fee payments for Class {ordinal(standard)}.</p>
         </div>
-        <label className="text-sm text-slate-500">
-          Show{' '}
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="ml-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-800 outline-none"
-          >
-            <option>All</option>
-            <option>Completed</option>
-            <option>Pending</option>
-          </select>
-        </label>
+        <div className="flex flex-wrap items-center gap-4">
+          <StandardSelect />
+          <label className="text-sm text-slate-500">
+            Show{' '}
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="ml-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-800 outline-none"
+            >
+              <option>All</option>
+              <option>Completed</option>
+              <option>Pending</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -120,6 +130,7 @@ useEffect(() => {
           </div>
         ))}
       </div>
+
       <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
         <p className="text-sm font-semibold">WhatsApp reminder message</p>
         <textarea
@@ -135,6 +146,7 @@ useEffect(() => {
           </button>
         </div>
       </div>
+
       <div className="mt-6 space-y-3">
         {visible.map((r) => {
           const open = openId === r.studentId
@@ -183,28 +195,27 @@ useEffect(() => {
                           <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${badge[i.status]}`}>
                             {i.status}
                           </span>
-                         {i.status === 'Pending' && (
-  <>
-    <a
-      href={waLink(
-        r.student.phone,
-        buildMessage(template, r.student.name, inr(i.amount), i.label, i.dueDate)
-      )}
-      target="_blank"
-      rel="noreferrer"
-      className="flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-600"
-    >
-      <MessageCircle size={12} /> Remind
-    </a>
-    <button
-      onClick={() => markPaid(r.studentId, i.id)}
-      className="rounded-lg bg-gold-400 px-3 py-1 text-xs font-medium text-navy-900 hover:bg-gold-300"
-    >
-      Mark paid
-    </button>
-  </>
-)}
-                          
+                          {i.status === 'Pending' && (
+                            <>
+                              <a
+                                href={waLink(
+                                  r.student.phone,
+                                  buildMessage(template, r.student.name, inr(i.amount), i.label, i.dueDate)
+                                )}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-600"
+                              >
+                                <MessageCircle size={12} /> Remind
+                              </a>
+                              <button
+                                onClick={() => markPaid(r.studentId, i.id)}
+                                className="rounded-lg bg-gold-400 px-3 py-1 text-xs font-medium text-navy-900 hover:bg-gold-300"
+                              >
+                                Mark paid
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}

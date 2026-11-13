@@ -2,18 +2,29 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { students } from '../data/students'
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+import StandardSelect from '../components/StandardSelect'
 
 export default function Students() {
+  const { standard } = useUser()
   const [query, setQuery] = useState('')
 
-  const filtered = students.filter((s) =>
-    s.name.toLowerCase().includes(query.toLowerCase())
-  )
+  // only students of the selected (or own) class are listed
+  const classmates = students.filter((s) => s.standard === standard)
+  const filtered = classmates.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Students</h1>
-      <p className="mt-1 text-slate-500">{students.length} students enrolled</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Students</h1>
+          <p className="mt-1 text-slate-500">
+            {classmates.length} students in Class {ordinal(standard)}
+          </p>
+        </div>
+        <StandardSelect />
+      </div>
 
       <div className="mt-6 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
         <Search size={18} className="text-slate-400" />
@@ -43,9 +54,7 @@ export default function Students() {
         ))}
       </div>
 
-      {filtered.length === 0 && (
-        <p className="mt-6 text-slate-500">No students match your search.</p>
-      )}
+      {filtered.length === 0 && <p className="mt-6 text-slate-500">No students match your search.</p>}
     </div>
   )
 }

@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Timer } from 'lucide-react'
+import { Lock, Timer } from 'lucide-react'
 import { tests } from '../data/tests'
 import { useUser } from '../context/UserContext'
 
 export default function TakeTest() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { currentUser } = useUser()
+  const { currentUser, isAdmin, standard } = useUser()
   const test = tests.find((t) => t.id === Number(id))
+
+  // a student can only take tests of their own class
+  const allowed = Boolean(test) && !isAdmin && test.standard === standard
 
   const [answers, setAnswers] = useState({})
   const [secondsLeft, setSecondsLeft] = useState((test?.duration ?? 0) * 60)
 
   useEffect(() => {
+    if (!allowed) return
     const timer = setInterval(() => setSecondsLeft((s) => s - 1), 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [allowed])
 
   useEffect(() => {
-    if (test && secondsLeft <= 0) submit()
+    if (allowed && secondsLeft <= 0) submit()
   }, [secondsLeft])
 
   function submit() {
@@ -29,6 +33,7 @@ export default function TakeTest() {
       testId: test.id,
       title: test.title,
       student: currentUser,
+      standard: test.standard,
       score,
       total: test.questions.length,
       date: new Date().toLocaleDateString('en-IN'),
@@ -39,11 +44,25 @@ export default function TakeTest() {
     navigate('/results')
   }
 
-  if (!test) {
+  if (!allowed) {
+    const title = !test
+      ? 'Test not found'
+      : isAdmin
+        ? 'Students attempt tests'
+        : 'Not available for your class'
+    const text = !test
+      ? 'This test does not exist.'
+      : isAdmin
+        ? 'Log in as a student to attempt this test.'
+        : 'This test belongs to a different class.'
     return (
-      <div>
-        <p>Test not found.</p>
-        <Link to="/tests" className="text-indigo-600">Back to tests</Link>
+      <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
+        <Lock className="mx-auto text-slate-400" size={32} />
+        <h1 className="mt-3 text-2xl font-bold">{title}</h1>
+        <p className="mt-1 text-slate-500">{text}</p>
+        <Link to="/tests" className="mt-4 inline-block font-medium text-indigo-600">
+          Back to tests
+        </Link>
       </div>
     )
   }
@@ -91,7 +110,7 @@ export default function TakeTest() {
 
       <button
         onClick={submit}
-        className="mt-6 rounded-xl bg-gold-400 text-navy-900 hover:bg-gold-300"
+        className="mt-6 rounded-xl bg-gold-400 px-6 py-3 font-medium text-navy-900 hover:bg-gold-300"
       >
         Submit test
       </button>

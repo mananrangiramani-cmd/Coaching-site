@@ -10,77 +10,59 @@
   --color-indigo-700: #0f1f4d;
   --color-slate-900: #0f1f4d;
   --color-slate-700: #1e2f63;
-
   --color-navy-950: #0a1736;
   --color-navy-900: #0f1f4d;
   --color-navy-800: #172a63;
-
   --color-gold-300: #fde68a;
   --color-gold-400: #facc15;
   --color-gold-500: #eab308;
-    --color-snow: #ffffff;
+  --color-snow: #ffffff;
+  --color-sidebar: #0f1f4d;
 }
 
-html {
-  font-size: 18px;
-}
+html { font-size: 18px; }
 
-:root {
-  --app-from: #ffffff;
-  --app-via: #f6f8fd;
-  --app-to: #eaf0fb;
-}
+:root { --app-from: #ffffff; --app-via: #f6f8fd; --app-to: #eaf0fb; }
 
 .app-bg {
   background-color: #fbfcff;
   background-image: url('/doodles-light.svg');
   background-size: 640px 640px;
 }
-
-.dark .app-bg {
-  background-color: #0c1330;
-  background-image: url('/doodles-dark.svg');
-}
+.dark .app-bg { background-color: #0e1d4a; background-image: url('/doodles-dark.svg'); }
 
 @media (max-width: 640px) {
-  .app-bg {
-    background-size: 440px 440px;
-  }
+  .app-bg { background-size: 440px 440px; }
 }
 
 .dark {
   color-scheme: dark;
-  --app-from: #0a1028;
-  --app-via: #0c1330;
-  --app-to: #0a1a2a;
-
-  --color-white: #131d3b;
-  --color-slate-50: #1a2547;
-  --color-slate-100: #22305a;
-  --color-slate-200: #2c3b6b;
-  --color-slate-300: #4a5a8a;
-  --color-slate-400: #8b97b8;
-  --color-slate-500: #a3aecb;
-  --color-slate-600: #c3cbe0;
-  --color-slate-700: #d5dbeb;
-  --color-slate-800: #e6eaf5;
-  --color-slate-900: #f1f4fb;
-
-  --color-indigo-50: #1a2550;
-  --color-indigo-100: #243468;
-  --color-indigo-300: #3b4f94;
-  --color-indigo-500: #6f86d6;
-  --color-indigo-600: #9fb0e6;
-  --color-indigo-700: #b4c0e6;
-
-  --color-emerald-50: #0f2a24;
-  --color-emerald-100: #123a30;
+  --color-sidebar: #000000;
+  --color-white: #16275e;
+  --color-slate-50: #1c3070;
+  --color-slate-100: #243a82;
+  --color-slate-200: #2f4590;
+  --color-slate-300: #4a62b0;
+  --color-slate-400: #94a3d4;
+  --color-slate-500: #aab6df;
+  --color-slate-600: #c9d2ee;
+  --color-slate-700: #dce2f5;
+  --color-slate-800: #eaeefa;
+  --color-slate-900: #f5f7fd;
+  --color-indigo-50: #1c3070;
+  --color-indigo-100: #28408f;
+  --color-indigo-300: #3b57b0;
+  --color-indigo-500: #7d93e0;
+  --color-indigo-600: #a9b9ee;
+  --color-indigo-700: #bcc8f2;
+  --color-emerald-50: #0f2f33;
+  --color-emerald-100: #134238;
   --color-emerald-200: #1f5a4a;
   --color-emerald-600: #34d399;
-  --color-amber-100: #3a2d0e;
+  --color-amber-100: #3d3210;
   --color-amber-600: #fbbf24;
-  --color-rose-100: #3b1420;
+  --color-rose-100: #3d1a2c;
   --color-rose-600: #fb7185;
-  --color-orange-100: #3a2410;
+  --color-orange-100: #3d2a14;
   --color-orange-600: #fb923c;
 }

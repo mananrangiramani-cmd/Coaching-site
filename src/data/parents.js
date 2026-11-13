@@ -6,4 +6,6 @@ export const parents = {
   4: { name: 'Mrs. Iyer', phone: '98200 90004' },
   5: { name: 'Mr. Singh', phone: '98200 90005' },
   6: { name: 'Mrs. Nair', phone: '98200 90006' },
+  7: { name: 'Mr. Kapoor', phone: '98200 90007' },
+  8: { name: 'Mrs. Reddy', phone: '98200 90008' },
 }

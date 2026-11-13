@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Students from './pages/Students'
 import StudentDetail from './pages/StudentDetail'
 import Courses from './pages/Courses'
+import CourseDetail from './pages/CourseDetail'
 import Tests from './pages/Tests'
 import TakeTest from './pages/TakeTest'
 import Results from './pages/Results'
@@ -21,27 +22,14 @@ export default function App() {
         <Route path="/students" element={<Students />} />
         <Route path="/students/:id" element={<StudentDetail />} />
         <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/tests" element={<Tests />} />
         <Route path="/tests/:id" element={<TakeTest />} />
         <Route path="/results" element={<Results />} />
         <Route path="/queries" element={<Queries />} />
         <Route path="/about" element={<About />} />
-        <Route
-         path="/attendance"
-          element={
-            <RequireAdmin>
-              <Attendance />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/payments"
-          element={
-            <RequireAdmin>
-              <Payments />
-            </RequireAdmin>
-          }
-        />
+        <Route path="/payments" element={<RequireAdmin><Payments /></RequireAdmin>} />
+        <Route path="/attendance" element={<RequireAdmin><Attendance /></RequireAdmin>} />
       </Route>
     </Routes>
   )

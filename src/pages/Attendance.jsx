@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { CheckCircle2, Fingerprint, LogIn, LogOut, MessageCircle, Trash2 } from 'lucide-react'
 import { students } from '../data/students'
 import { parents } from '../data/parents'
+import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+import StandardSelect from '../components/StandardSelect'
 
 function waLink(phone, text) {
   const digits = phone.replace(/\D/g, '')
@@ -18,6 +21,9 @@ function buildMessage(parent, student, type, ts) {
 }
 
 export default function Attendance() {
+  const { standard } = useUser()
+  const classStudents = students.filter((s) => s.standard === standard)
+
   const [events, setEvents] = useState(() => {
     try {
       const saved = localStorage.getItem('attendance-v1')
@@ -26,13 +32,17 @@ export default function Attendance() {
       return []
     }
   })
-  const [studentId, setStudentId] = useState(students[0].id)
+  const [pickedId, setPickedId] = useState(null)
+
+  // keep the picked student inside the selected class
+  const studentId = classStudents.some((s) => s.id === pickedId) ? pickedId : classStudents[0]?.id
 
   useEffect(() => {
     localStorage.setItem('attendance-v1', JSON.stringify(events))
   }, [events])
 
   function punch(type) {
+    if (!studentId) return
     const event = { id: Date.now(), studentId: Number(studentId), type, ts: Date.now(), notified: false }
     setEvents([event, ...events])
   }
@@ -41,8 +51,13 @@ export default function Attendance() {
     setEvents(events.map((e) => (e.id === id ? { ...e, notified: true } : e)))
   }
 
+  // only the selected class's punches
+  const classEvents = events.filter(
+    (e) => students.find((s) => s.id === e.studentId)?.standard === standard
+  )
+
   const today = new Date().toDateString()
-  const todays = events.filter((e) => new Date(e.ts).toDateString() === today)
+  const todays = classEvents.filter((e) => new Date(e.ts).toDateString() === today)
 
   // latest punch per student today (todays is newest first, so go oldest to newest)
   const lastPunch = {}
@@ -59,16 +74,21 @@ export default function Attendance() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Attendance</h1>
-          <p className="mt-1 text-slate-500">Fingerprint entry and exit log with parent alerts.</p>
+          <p className="mt-1 text-slate-500">
+            Fingerprint entry and exit log for Class {ordinal(standard)}, with parent alerts.
+          </p>
         </div>
-        {events.length > 0 && (
-          <button
-            onClick={() => setEvents([])}
-            className="flex items-center gap-1 rounded-xl px-3 py-2 text-sm text-slate-500 hover:bg-white hover:text-red-500"
-          >
-            <Trash2 size={16} /> Clear log
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <StandardSelect />
+          {events.length > 0 && (
+            <button
+              onClick={() => setEvents([])}
+              className="flex items-center gap-1 rounded-xl px-3 py-2 text-sm text-slate-500 hover:bg-white hover:text-red-500"
+            >
+              <Trash2 size={16} /> Clear log
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -95,11 +115,11 @@ export default function Attendance() {
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <select
-            value={studentId}
-            onChange={(e) => setStudentId(e.target.value)}
+            value={studentId ?? ''}
+            onChange={(e) => setPickedId(Number(e.target.value))}
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
           >
-            {students.map((s) => (
+            {classStudents.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>
@@ -121,8 +141,8 @@ export default function Attendance() {
       </div>
 
       <div className="mt-6 space-y-3">
-        {events.length === 0 && <p className="text-slate-500">No punches yet. Try Punch in above.</p>}
-        {events.map((e) => {
+        {classEvents.length === 0 && <p className="text-slate-500">No punches yet. Try Punch in above.</p>}
+        {classEvents.map((e) => {
           const student = students.find((s) => s.id === e.studentId)
           const parent = parents[e.studentId]
           if (!student || !parent) return null

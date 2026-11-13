@@ -58,13 +58,14 @@ function SidebarContent({ onNavigate, dark, onToggleTheme }) {
 
   const visibleItems = items.filter((g) => !g.adminOnly || isAdmin)
 
+  // the sidebar is navy in light mode and black in dark mode, so the text is always light
   const menuColors = dark
-    ? { color: '#e6ebf8', accentColor: '#facc15', lineColor: '#3b4f94' }
-    : { color: '#1f2f6b', accentColor: '#0f1f4d', lineColor: '#b9c3e0' }
+    ? { color: '#e6ebf8', accentColor: '#facc15', lineColor: '#3f3f46' }
+    : { color: '#e6ebf8', accentColor: '#facc15', lineColor: '#4a62b0' }
 
   return (
     <>
-      <div className="mb-6 flex items-center gap-2 px-2 text-xl font-bold text-slate-900">
+      <div className="mb-6 flex items-center gap-2 px-2 text-xl font-bold text-snow">
         <span className="h-3 w-3 rounded-full bg-gold-400" />
         XYZ Coaching
       </div>
@@ -80,9 +81,9 @@ function SidebarContent({ onNavigate, dark, onToggleTheme }) {
             onNavigate?.()
           }}
           {...menuColors}
-          width={240}
+          width={200}
           rowHeight={36}
-          indent={40}
+          indent={34}
           trunk={14}
           radius={10}
           lineWidth={1.5}
@@ -95,18 +96,18 @@ function SidebarContent({ onNavigate, dark, onToggleTheme }) {
       <div className="mt-auto space-y-2 pt-4">
         <button
           onClick={onToggleTheme}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-blue-100/80 hover:bg-snow/10 hover:text-snow"
         >
           {dark ? <Sun size={18} /> : <Moon size={18} />}
           {dark ? 'Light mode' : 'Dark mode'}
         </button>
 
-        <div className="rounded-xl bg-slate-50 p-3">
+        <div className="rounded-xl bg-snow/10 p-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-400">Logged in as</p>
+            <p className="text-xs text-blue-200/70">Logged in as</p>
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                isAdmin ? 'bg-gold-400 text-navy-900' : 'bg-slate-200 text-slate-700'
+                isAdmin ? 'bg-gold-400 text-navy-900' : 'bg-snow/20 text-snow'
               }`}
             >
               {role}
@@ -115,10 +116,10 @@ function SidebarContent({ onNavigate, dark, onToggleTheme }) {
           <select
             value={currentUser}
             onChange={(e) => setCurrentUser(e.target.value)}
-            className="mt-1 w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
+            className="mt-1 w-full bg-transparent text-sm font-medium text-snow outline-none"
           >
             {users.map((u) => (
-              <option key={u.name} className="bg-white text-slate-800">
+              <option key={u.name} className="bg-sidebar text-snow">
                 {u.name}
               </option>
             ))}
@@ -127,7 +128,7 @@ function SidebarContent({ onNavigate, dark, onToggleTheme }) {
             <Link
               to={`/students/${me.id}`}
               onClick={onNavigate}
-              className="mt-2 block text-xs font-medium text-indigo-600 hover:underline"
+              className="mt-2 block text-xs font-medium text-gold-400 hover:underline"
             >
               View my profile
             </Link>
@@ -152,7 +153,7 @@ export default function Layout() {
   return (
     <div className="app-bg flex min-h-screen text-slate-800">
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-4 md:flex">
+      <aside className="sticky top-0 hidden h-screen w-52 shrink-0 flex-col border-r border-snow/10 bg-sidebar p-3 md:flex">
         <SidebarContent dark={dark} onToggleTheme={toggleTheme} />
       </aside>
 
@@ -160,8 +161,8 @@ export default function Layout() {
       {open && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute left-0 top-0 flex h-full w-72 flex-col bg-white p-4 shadow-xl">
-            <button onClick={() => setOpen(false)} className="mb-2 self-end text-slate-700">
+          <aside className="absolute left-0 top-0 flex h-full w-64 flex-col bg-sidebar p-4 shadow-xl">
+            <button onClick={() => setOpen(false)} className="mb-2 self-end text-snow">
               <X size={22} />
             </button>
             <SidebarContent onNavigate={() => setOpen(false)} dark={dark} onToggleTheme={toggleTheme} />
@@ -171,12 +172,12 @@ export default function Layout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-          <span className="flex items-center gap-2 font-bold text-slate-900">
+        <header className="sticky top-0 z-30 flex items-center justify-between bg-sidebar px-4 py-3 md:hidden">
+          <span className="flex items-center gap-2 font-bold text-snow">
             <span className="h-2.5 w-2.5 rounded-full bg-gold-400" />
             XYZ Coaching
           </span>
-          <button onClick={() => setOpen(true)} className="text-slate-700">
+          <button onClick={() => setOpen(true)} className="text-snow">
             <Menu size={24} />
           </button>
         </header>

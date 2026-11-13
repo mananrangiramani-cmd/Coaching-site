@@ -1,31 +1,34 @@
 import { useEffect, useState } from 'react'
 import DoubtCard from '../components/DoubtCard'
 import CommunityPanel from '../components/CommunityPanel'
+import StandardSelect from '../components/StandardSelect'
 import { initialDoubts, subjects } from '../data/doubts'
 import { useUser } from '../context/UserContext'
+import { ordinal } from '../data/standards'
+
 export default function Queries() {
+  const { currentUser, isAdmin, standard } = useUser()
   const [doubts, setDoubts] = useState(() => {
     try {
-      const saved = localStorage.getItem('doubts-v2')
+      const saved = localStorage.getItem('doubts-v3')
       return saved ? JSON.parse(saved) : initialDoubts
     } catch {
       return initialDoubts
     }
   })
-     const { currentUser } = useUser()
   const [text, setText] = useState('')
   const [subject, setSubject] = useState('Physics')
   const [filter, setFilter] = useState('All')
 
   useEffect(() => {
-    localStorage.setItem('doubts-v2', JSON.stringify(doubts))
+    localStorage.setItem('doubts-v3', JSON.stringify(doubts))
   }, [doubts])
 
   function addDoubt(e) {
     e.preventDefault()
     if (!text.trim()) return
     setDoubts([
-      { id: Date.now(), author: currentUser, subject, text: text.trim(), time: 'Just now', upvotes: 0, replies: [] },
+      { id: Date.now(), standard, author: currentUser, subject, text: text.trim(), time: 'Just now', upvotes: 0, replies: [] },
       ...doubts,
     ])
     setText('')
@@ -55,47 +58,60 @@ export default function Queries() {
     )
   }
 
-  const visible = filter === 'All' ? doubts : doubts.filter((d) => d.subject === filter)
+  // each class has its own community: only doubts of this standard are shown
+  const classDoubts = doubts.filter((d) => d.standard === standard)
+  const visible = filter === 'All' ? classDoubts : classDoubts.filter((d) => d.subject === filter)
 
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Doubts</h1>
-          <p className="mt-1 text-slate-500">Ask, answer and learn together.</p>
+          <p className="mt-1 text-slate-500">
+            {isAdmin
+              ? `Viewing the Class ${ordinal(standard)} community (read-only).`
+              : `Ask, answer and learn with your Class ${ordinal(standard)} classmates.`}
+          </p>
         </div>
-          <p className="text-sm text-slate-500">
-     Posting as <span className="font-medium text-slate-800">{currentUser}</span>
-   </p>
+        <div className="flex items-center gap-3">
+          <StandardSelect />
+          {!isAdmin && (
+            <p className="text-sm text-slate-500">
+              Posting as <span className="font-medium text-slate-800">{currentUser}</span>
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div>
-          <form onSubmit={addDoubt} className="rounded-2xl bg-white p-4 shadow-sm">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="What's your doubt?"
-              rows={3}
-              className="w-full resize-none text-sm outline-none"
-            />
-            <div className="mt-3 flex items-center justify-between">
-              <select
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                className="rounded-xl border border-slate-200 px-3 py-1.5 text-sm outline-none"
-              >
-                {subjects.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-              <button className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-700">
-                Post doubt
-              </button>
-            </div>
-          </form>
+          {!isAdmin && (
+            <form onSubmit={addDoubt} className="rounded-2xl bg-white p-4 shadow-sm">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="What's your doubt?"
+                rows={3}
+                className="w-full resize-none text-sm outline-none"
+              />
+              <div className="mt-3 flex items-center justify-between">
+                <select
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="rounded-xl border border-slate-200 px-3 py-1.5 text-sm outline-none"
+                >
+                  {subjects.map((s) => (
+                    <option key={s}>{s}</option>
+                  ))}
+                </select>
+                <button className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                  Post doubt
+                </button>
+              </div>
+            </form>
+          )}
 
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className={`${isAdmin ? '' : 'mt-6 '}flex flex-wrap gap-2`}>
             {['All', ...subjects].map((s) => (
               <button
                 key={s}
@@ -115,17 +131,18 @@ export default function Queries() {
                 key={d.id}
                 doubt={d}
                 currentUser={currentUser}
+                readOnly={isAdmin}
                 onUpvote={upvote}
                 onReply={addReply}
                 onAccept={acceptReply}
               />
             ))}
-            {visible.length === 0 && <p className="text-slate-500">No doubts in this subject yet.</p>}
+            {visible.length === 0 && <p className="text-slate-500">No doubts here yet.</p>}
           </div>
         </div>
 
         <aside className="lg:sticky lg:top-8 lg:self-start">
-          <CommunityPanel doubts={doubts} />
+          <CommunityPanel doubts={classDoubts} standard={standard} />
         </aside>
       </div>
     </div>

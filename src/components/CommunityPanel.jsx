@@ -5,7 +5,8 @@ function initials(name) {
   return name.split(' ').map((n) => n[0]).join('')
 }
 
-export default function CommunityPanel({ doubts }) {
+// doubts must already be filtered to one standard; standard picks the matching students.
+export default function CommunityPanel({ doubts, standard }) {
   const [tab, setTab] = useState('helpers')
 
   // count accepted answers per person
@@ -16,11 +17,12 @@ export default function CommunityPanel({ doubts }) {
     })
   )
   const helpers = Object.entries(counts)
-    .map(([name, solved]) => ({ name, value: `${solved} solved` }))
-    .sort((a, b) => parseInt(b.value) - parseInt(a.value))
+    .map(([name, solved]) => ({ name, solved, value: `${solved} solved` }))
+    .sort((a, b) => b.solved - a.solved)
     .slice(0, 5)
 
-  const performers = [...students]
+  const performers = students
+    .filter((s) => s.standard === standard)
     .sort((a, b) => b.avgScore - a.avgScore)
     .slice(0, 5)
     .map((s) => ({ name: s.name, value: `${s.avgScore}%` }))
@@ -57,9 +59,7 @@ export default function CommunityPanel({ doubts }) {
             <span className="text-sm font-semibold text-indigo-600">{p.value}</span>
           </li>
         ))}
-        {list.length === 0 && (
-          <li className="text-sm text-slate-500">No solved doubts yet.</li>
-        )}
+        {list.length === 0 && <li className="text-sm text-slate-500">No solved doubts yet.</li>}
       </ul>
     </div>
   )
