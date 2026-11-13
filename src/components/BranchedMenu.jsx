@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 
+const ACTIVE_BG = 'color-mix(in srgb, currentColor 14%, transparent)'
+const HOVER_BG = 'color-mix(in srgb, currentColor 8%, transparent)'
+
 export default function BranchedMenu({
   items = [],
   defaultOpen = [],
@@ -61,7 +64,7 @@ export default function BranchedMenu({
                   transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
                 }}
               >
-                <HugeiconsIcon icon={ArrowRight01Icon} size={16} color={color} />
+                <HugeiconsIcon icon={ArrowRight01Icon} size={16} color="currentColor" />
               </span>
               {group.label}
             </button>
@@ -124,11 +127,11 @@ export default function BranchedMenu({
                           padding: '0 10px', border: 0, borderRadius: 8, cursor: 'pointer',
                           textAlign: 'left', fontSize,
                           color: isActive ? accentColor : color,
-                          background: isActive ? 'rgba(255,255,255,0.14)' : 'transparent',
+                          background: isActive ? ACTIVE_BG : 'transparent',
                           fontWeight: isActive ? 600 : 400,
                           transition: 'background 150ms ease',
                         }}
-                        onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.07)' }}
+                        onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = HOVER_BG }}
                         onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
                       >
                         {item.icon && (

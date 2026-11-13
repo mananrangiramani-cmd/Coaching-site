@@ -31,7 +31,7 @@ export default function Home() {
     <div className="space-y-12">
       {/* Hero */}
             <section className="rounded-3xl bg-navy-900 p-8 text-snow sm:p-12">
-        <p className="text-sm font-medium text-gold-400">Welcome to DLPT Coaching</p>
+        <p className="text-sm font-medium text-gold-400">Welcome to XYZ Coaching</p>
         <h1 className="mt-2 max-w-xl text-3xl font-bold leading-tight sm:text-4xl">
           Learn smarter. Score higher. Grow together.
         </h1>

@@ -10,5 +10,5 @@ export const achievements = [
   { id: 2, title: '12 students cleared JEE Main 2026 with 95+ percentile', date: 'Sep 2026', type: 'Batch' },
   { id: 3, title: 'Dr. R. Verma honoured as Best Physics Educator', date: 'Aug 2026', type: 'Faculty' },
   { id: 4, title: 'Diya Patel secured a top 500 rank in NEET mock series', date: 'Aug 2026', type: 'Student' },
-  { id: 5, title: 'DLPT Coaching crossed 500 enrolled students', date: 'Jul 2026', type: 'Institute' },
+  { id: 5, title: 'XYZ Coaching crossed 500 enrolled students', date: 'Jul 2026', type: 'Institute' },
 ]
