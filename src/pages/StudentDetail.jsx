@@ -4,7 +4,7 @@ import { students } from '../data/students'
 import { initialDoubts } from '../data/doubts'
 import { useUser } from '../context/UserContext'
 import { ordinal } from '../data/standards'
-
+import StudentProgress from '../components/StudentProgress'
 function load(key, fallback) {
   try {
     const saved = localStorage.getItem(key)
@@ -24,11 +24,12 @@ function initials(name) {
 
 export default function StudentDetail() {
   const { id } = useParams()
-  const { isAdmin, currentUser, standard } = useUser()
+  const { isStaff, currentUser, standard } = useUser()
   const student = students.find((s) => s.id === Number(id))
+  
 
   // a student cannot open profiles from another class
-  if (!student || (!isAdmin && student.standard !== standard)) {
+  if (!student || (!isStaff && student.standard !== standard)) {
     return (
       <div>
         <p>Student not found.</p>
@@ -38,7 +39,7 @@ export default function StudentDetail() {
   }
 
   // scores, contact details and test history are private to the student and the admin
-  const canSeeDetails = isAdmin || student.name === currentUser
+  const canSeeDetails = isStaff || student.name === currentUser
 
   const header = (
     <>
@@ -79,11 +80,6 @@ export default function StudentDetail() {
   const myReplies = doubts.flatMap((d) => d.replies).filter((r) => r.author === student.name)
   const solvedForOthers = myReplies.filter((r) => r.accepted).length
 
-  const trend = results
-    .slice(0, 6)
-    .reverse()
-    .map((r) => Math.round((r.score / r.total) * 100))
-
   const stats = [
     { label: 'Attendance', value: `${student.attendance}%` },
     { label: 'Average score', value: `${student.avgScore}%` },
@@ -121,26 +117,19 @@ export default function StudentDetail() {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">Test performance</h2>
+        <h2 className="text-lg font-semibold">Test history</h2>
 
         {results.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">No tests taken yet.</p>
         ) : (
           <>
-            <div className="mt-4 flex h-28 items-end gap-3">
-              {trend.map((p, i) => (
-                <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1">
-                  <span className="text-xs text-slate-500">{p}%</span>
-                  <div className="w-full rounded-t-lg bg-indigo-500" style={{ height: `${p * 0.8}px` }} />
-                </div>
-              ))}
-            </div>
 
-            <div className="mt-5 divide-y divide-slate-100">
+
+            <div className="mt-4 divide-y divide-slate-100">
               {results.map((r) => {
                 const p = Math.round((r.score / r.total) * 100)
                 return (
-                  <div key={r.id} className="flex items-center justify-between py-3">
+                  <Link to={`/results/${r.id}`} key={r.id} className="flex items-center justify-between py-3 hover:bg-slate-50">
                     <div>
                       <p className="text-sm font-medium">{r.title}</p>
                       <p className="text-xs text-slate-400">{r.date}</p>
@@ -148,7 +137,7 @@ export default function StudentDetail() {
                     <p className={`font-semibold ${scoreColor(p)}`}>
                       {p}% <span className="text-xs font-normal text-slate-400">({r.score}/{r.total})</span>
                     </p>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
@@ -156,6 +145,8 @@ export default function StudentDetail() {
         )}
       </div>
 
+      <StudentProgress student={student} />
+      
       <div className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Community activity</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">

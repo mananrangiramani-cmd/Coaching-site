@@ -4,9 +4,9 @@ import { STANDARDS, ordinal } from '../data/standards'
 
 // Admin gets a dropdown for 9th to 12th. Students see their own class, locked.
 export default function StandardSelect() {
-  const { isAdmin, standard, setStandard } = useUser()
+  const { isStaff, standard, setStandard } = useUser()
 
-  if (!isAdmin) {
+  if (!isStaff) {
     return (
       <span className="flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm">
         <GraduationCap size={16} /> Class {ordinal(standard)}

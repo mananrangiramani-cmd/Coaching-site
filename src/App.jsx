@@ -13,6 +13,10 @@ import Queries from './pages/Queries'
 import Payments from './pages/Payments'
 import Attendance from './pages/Attendance'
 import About from './pages/About'
+import Reports from './pages/Reports'
+import Faculty from './pages/Faculty'
+import Materials from './pages/Materials'
+import ResultDetail from './pages/ResultDetail'
 
 export default function App() {
   return (
@@ -30,6 +34,10 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/payments" element={<RequireAdmin><Payments /></RequireAdmin>} />
         <Route path="/attendance" element={<RequireAdmin><Attendance /></RequireAdmin>} />
+        <Route path="/reports" element={<RequireAdmin><Reports /></RequireAdmin>} />
+        <Route path="/faculty" element={<Faculty />} />
+        <Route path="/materials" element={<Materials />} />
+        <Route path="/results/:id" element={<ResultDetail />} />
       </Route>
     </Routes>
   )

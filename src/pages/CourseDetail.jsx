@@ -36,7 +36,7 @@ function loadVideos() {
 
 export default function CourseDetail() {
   const { id } = useParams()
-  const { isAdmin, standard } = useUser()
+  const { isStaff, standard, subject } = useUser()
   const course = courses.find((c) => c.id === Number(id))
 
   const [videos, setVideos] = useState(loadVideos)
@@ -122,7 +122,7 @@ export default function CourseDetail() {
     if (v.kind === 'file') deleteFile(v.id).catch(() => {})
   }
 
-  if (!course || (!isAdmin && !course.standards.includes(standard))) {
+  if (!course || (!isStaff && !course.standards.includes(standard))) {
     return (
       <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
         <Lock className="mx-auto text-slate-400" size={32} />
@@ -192,7 +192,7 @@ export default function CourseDetail() {
                 </>
               ) : (
                 <div className="flex aspect-video items-center justify-center p-6 text-center text-slate-500">
-                  {isAdmin ? 'No videos yet. Add the first one below.' : 'No videos yet. Check back soon.'}
+                  {isStaff ? 'No videos yet. Add the first one below.' : 'No videos yet. Check back soon.'}
                 </div>
               )}
             </div>
@@ -216,7 +216,7 @@ export default function CourseDetail() {
                         {i + 1}. {v.title}
                       </span>
                     </button>
-                    {isAdmin && (
+                    {isStaff && (
                       <button
                         onClick={() => removeVideo(v)}
                         title="Delete video"
@@ -231,7 +231,7 @@ export default function CourseDetail() {
             )}
 
             {/* Admin upload */}
-            {isAdmin && (
+            {isStaff && (
               <form onSubmit={addVideo} className="rounded-2xl bg-white p-5 shadow-sm">
                 <p className="font-semibold">Add a video to Class {ordinal(standard)}</p>
                 <div className="mt-3 flex gap-1 rounded-xl bg-slate-100 p-1 text-sm font-medium">
@@ -292,18 +292,22 @@ export default function CourseDetail() {
             )}
           </div>
 
-          {/* Test beside the videos */}
+                    {/* Test beside the videos */}
           <aside className="lg:sticky lg:top-8 lg:self-start">
             <div className="rounded-2xl bg-white p-5 shadow-sm">
               <p className="flex items-center gap-2 font-semibold">
                 <ClipboardList size={18} className="text-gold-500" /> Test for this course
               </p>
-              {courseTests.length === 0 && (
+              {courseTests.filter((t) => !subject || t.subject === subject).length === 0 && (
                 <p className="mt-3 text-sm text-slate-500">No test for this course yet.</p>
               )}
               <div className="mt-3 space-y-3">
-                {courseTests.map((t) => (
-                  <div key={t.id} className="rounded-xl bg-slate-50 p-3">
+                {courseTests.filter((t) => !subject || t.subject === subject).map((t) => (
+                  <Link
+                    key={t.id}
+                    to={`/tests/${t.id}`}
+                    className="block rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+                  >
                     <p className="text-sm font-semibold">{t.title}</p>
                     <p className="mt-1 flex items-center gap-3 text-xs text-slate-500">
                       <span>{t.questions.length} questions</span>
@@ -311,17 +315,10 @@ export default function CourseDetail() {
                         <Clock size={12} /> {t.duration} min
                       </span>
                     </p>
-                    {isAdmin ? (
-                      <p className="mt-2 text-xs text-slate-400">Students attempt this from their own login.</p>
-                    ) : (
-                      <Link
-                        to={`/tests/${t.id}`}
-                        className="mt-2 inline-block rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
-                      >
-                        Start test
-                      </Link>
-                    )}
-                  </div>
+                    <span className="mt-2 inline-block text-xs font-medium text-indigo-600">
+                      {isStaff ? 'Preview test →' : 'Start test →'}
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>

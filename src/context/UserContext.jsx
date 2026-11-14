@@ -28,12 +28,17 @@ export function UserProvider({ children }) {
 
   const role = users.find((u) => u.name === currentUser)?.role ?? 'student'
   const isAdmin = role === 'admin'
+  const isFaculty = role === 'faculty'
+  const isStaff = role === 'admin' || role === 'faculty'
+ const subject = isFaculty
+  ? users.find((u) => u.name === (currentUser?.name ?? currentUser))?.subject ?? null
+  : null
   const me = students.find((s) => s.name === currentUser)
-  const standard = isAdmin ? adminStandard : me?.standard ?? 11
+  const standard = isStaff ? adminStandard : me?.standard ?? 11
 
   return (
     <UserContext.Provider
-      value={{ currentUser, setCurrentUser, role, isAdmin, standard, setStandard: setAdminStandard }}
+      value={{ currentUser, setCurrentUser, role, isAdmin, standard, setStandard: setAdminStandard, isFaculty, isStaff, subject }}
     >
       {children}
     </UserContext.Provider>

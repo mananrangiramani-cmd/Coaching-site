@@ -6,6 +6,9 @@ import { faculty, achievements } from '../data/home'
 import { useUser } from '../context/UserContext'
 import { ordinal } from '../data/standards'
 import StandardSelect from '../components/StandardSelect'
+import UpcomingClasses from '../components/UpcomingClasses'
+import Announcements from '../components/Announcements'
+
 
 const medalColors = ['bg-amber-100 text-amber-600', 'bg-slate-200 text-slate-600', 'bg-orange-100 text-orange-600']
 
@@ -21,7 +24,7 @@ function initials(name) {
 }
 
 export default function Home() {
-  const { standard } = useUser()
+  const { standard,role } = useUser()
 
   // top performers and counts are for one class only
   const classmates = students.filter((s) => s.standard === standard)
@@ -29,8 +32,8 @@ export default function Home() {
   const classCourses = courses.filter((c) => c.standards.includes(standard))
 
   const stats = [
-    { label: `Students in Class ${ordinal(standard)}`, value: classmates.length, icon: Users },
-    { label: `Courses in Class ${ordinal(standard)}`, value: classCourses.length, icon: BookOpen },
+    { label: 'Students', value: students.length , icon: Users },
+    { label: 'Courses', value: courses.length, icon: BookOpen },
     { label: 'Expert faculty', value: faculty.length, icon: GraduationCap },
     { label: 'Achievements', value: achievements.length, icon: Award },
   ]
@@ -66,7 +69,10 @@ export default function Home() {
           </div>
         ))}
       </section>
-
+      <div className="grid gap-6 lg:grid-cols-2">
+        <UpcomingClasses />
+        <Announcements />
+      </div>
       {/* Top performers */}
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3">

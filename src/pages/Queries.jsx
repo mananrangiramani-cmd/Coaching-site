@@ -7,7 +7,7 @@ import { useUser } from '../context/UserContext'
 import { ordinal } from '../data/standards'
 
 export default function Queries() {
-  const { currentUser, isAdmin, standard } = useUser()
+  const { currentUser, isStaff, standard } = useUser()
   const [doubts, setDoubts] = useState(() => {
     try {
       const saved = localStorage.getItem('doubts-v3')
@@ -68,14 +68,14 @@ export default function Queries() {
         <div>
           <h1 className="text-3xl font-bold">Doubts</h1>
           <p className="mt-1 text-slate-500">
-            {isAdmin
+            {isStaff
               ? `Viewing the Class ${ordinal(standard)} community (read-only).`
               : `Ask, answer and learn with your Class ${ordinal(standard)} classmates.`}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <StandardSelect />
-          {!isAdmin && (
+          {!isStaff && (
             <p className="text-sm text-slate-500">
               Posting as <span className="font-medium text-slate-800">{currentUser}</span>
             </p>
@@ -85,7 +85,7 @@ export default function Queries() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div>
-          {!isAdmin && (
+          {!isStaff && (
             <form onSubmit={addDoubt} className="rounded-2xl bg-white p-4 shadow-sm">
               <textarea
                 value={text}
@@ -111,7 +111,7 @@ export default function Queries() {
             </form>
           )}
 
-          <div className={`${isAdmin ? '' : 'mt-6 '}flex flex-wrap gap-2`}>
+          <div className={`${isStaff ? '' : 'mt-6 '}flex flex-wrap gap-2`}>
             {['All', ...subjects].map((s) => (
               <button
                 key={s}
@@ -131,7 +131,7 @@ export default function Queries() {
                 key={d.id}
                 doubt={d}
                 currentUser={currentUser}
-                readOnly={isAdmin}
+                readOnly={isStaff}
                 onUpvote={upvote}
                 onReply={addReply}
                 onAccept={acceptReply}
