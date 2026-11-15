@@ -10,12 +10,12 @@
   --color-indigo-700: #0f1f4d;
   --color-slate-900: #0f1f4d;
   --color-slate-700: #1e2f63;
-  --color-navy-950: #0a1736;
+  --color-navy-950: #0a1433;
   --color-navy-900: #0f1f4d;
-  --color-navy-800: #172a63;
-  --color-gold-300: #fde68a;
-  --color-gold-400: #facc15;
-  --color-gold-500: #eab308;
+  --color-navy-800: #1a2e6b;
+  --color-gold-300: #fcd97d;
+  --color-gold-400: #f5c542;
+  --color-gold-500: #d9a521;
   --color-snow: #ffffff;
   --color-sidebar: #0f1f4d;
 }
@@ -83,4 +83,67 @@ html { font-size: 18px; }
 img, video, iframe, svg { max-width: 100%; }
 @media (max-width: 640px) {
   main { padding-bottom: 5rem; }   /* so the floating button never covers content */
+}
+/* ---------- polish ---------- */
+
+/* soft page colour so white cards stand out */
+.app-bg { background-color: #f3f5fb; }
+
+/* richer card shadows */
+.shadow-sm {
+  box-shadow: 0 1px 2px rgba(15, 31, 77, 0.06), 0 8px 20px -8px rgba(15, 31, 77, 0.14);
+}
+.dark .shadow-sm {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* clickable cards lift on hover */
+a[class*="rounded-2xl"], a[class*="rounded-xl"] {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+a[class*="rounded-2xl"]:hover, a[class*="rounded-xl"]:hover {
+  transform: translateY(-2px);
+}
+
+/* gold buttons get a gradient and a press effect */
+.bg-gold-400 { background-image: linear-gradient(180deg, #ffd96a, #f5c542); }
+button.bg-gold-400, a.bg-gold-400 { transition: transform 0.15s ease, filter 0.15s ease; }
+button.bg-gold-400:hover, a.bg-gold-400:hover { filter: brightness(1.05); transform: translateY(-1px); }
+button.bg-gold-400:active, a.bg-gold-400:active { transform: translateY(0) scale(0.98); }
+
+/* clear focus rings */
+:focus-visible { outline: 2px solid #f5c542; outline-offset: 2px; }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #f5c542 !important;
+  box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.28);
+}
+
+/* selection and scrollbar */
+::selection { background: #f5c542; color: #0f1f4d; }
+* { scrollbar-width: thin; scrollbar-color: #9aa8d6 transparent; }
+
+/* page transition */
+.page-enter { animation: page-in 0.35s ease both; }
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* loading skeleton */
+.skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #e5e9f5 25%, #f3f5fb 50%, #e5e9f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, #1c2f6e 25%, #243a80 50%, #1c2f6e 75%);
+  background-size: 200% 100%;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* respect people who turn animations off */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

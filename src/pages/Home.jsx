@@ -8,6 +8,7 @@ import { ordinal } from '../data/standards'
 import StandardSelect from '../components/StandardSelect'
 import UpcomingClasses from '../components/UpcomingClasses'
 import Announcements from '../components/Announcements'
+import Dashboard from '../components/Dashboard'
 
 
 const medalColors = ['bg-amber-100 text-amber-600', 'bg-slate-200 text-slate-600', 'bg-orange-100 text-orange-600']
@@ -31,13 +32,7 @@ export default function Home() {
   const topPerformers = [...classmates].sort((a, b) => b.avgScore - a.avgScore).slice(0, 3)
   const classCourses = courses.filter((c) => c.standards.includes(standard))
 
-  const stats = [
-    { label: 'Students', value: students.length , icon: Users },
-    { label: 'Courses', value: courses.length, icon: BookOpen },
-    { label: 'Expert faculty', value: faculty.length, icon: GraduationCap },
-    { label: 'Achievements', value: achievements.length, icon: Award },
-  ]
-
+  
   return (
     <div className="space-y-12">
       {/* Hero */}
@@ -60,15 +55,7 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="rounded-2xl bg-white p-5 shadow-sm">
-            <Icon size={20} className="text-indigo-500" />
-            <p className="mt-3 text-2xl font-bold">{value}</p>
-            <p className="text-sm text-slate-500">{label}</p>
-          </div>
-        ))}
-      </section>
+      <Dashboard />
       <div className="grid gap-6 lg:grid-cols-2">
         <UpcomingClasses />
         <Announcements />

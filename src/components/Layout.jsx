@@ -16,6 +16,7 @@ import BranchedMenu from './BranchedMenu'
 import { students } from '../data/students'
 import { users } from '../data/users'
 import { useUser } from '../context/UserContext'
+import FloatingTools from './FloatingTools'
 import  ReportFab  from '../components/ReportFab'
 const items = [
   {
@@ -151,7 +152,7 @@ function SidebarContent({ onNavigate, dark, onToggleTheme, mobile = false }) {
 export default function Layout() {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
-
+  const location = useLocation()
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
     localStorage.setItem('theme', dark ? 'dark' : 'light')
@@ -192,12 +193,13 @@ export default function Layout() {
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
-          <div className="mx-auto max-w-4xl">
-            <Outlet />
+         <div key={location.pathname} className="page-enter">
+          <Outlet />
           </div>
         </main>
       </div>
       <ReportFab />
+      <FloatingTools />
     </div>
   )
 }

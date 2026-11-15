@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { students } from '../data/students'
 import { useUser } from '../context/UserContext'
@@ -9,21 +9,35 @@ import StandardSelect from '../components/StandardSelect'
 export default function Students() {
   const { standard } = useUser()
   const [query, setQuery] = useState('')
+  const [params, setParams] = useSearchParams()
+  const school = params.get('school') || 'all'
+  const schools = [...new Set(students.filter((s) => s.standard === standard).map((s) => s.school).filter(Boolean))].sort()
 
   // only students of the selected (or own) class are listed
-  const classmates = students.filter((s) => s.standard === standard)
+  const classmates = students.filter((s) => s.standard === standard).filter((s) => school === 'all' || s.school === school)
   const filtered = classmates.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Students</h1>
           <p className="mt-1 text-slate-500">
             {classmates.length} students in Class {ordinal(standard)}
+            {school !== 'all' && ` · ${school}`}
           </p>
         </div>
-        <StandardSelect />
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={school}
+            onChange={(e) => (e.target.value === 'all' ? setParams({}) : setParams({ school: e.target.value }))}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+          >
+            <option value="all">All schools</option>
+            {schools.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <StandardSelect />
+        </div>
       </div>
 
       <div className="mt-6 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
@@ -48,7 +62,7 @@ export default function Students() {
             </div>
             <div>
               <p className="font-semibold">{s.name}</p>
-              <p className="text-sm text-slate-500">{s.batch}</p>
+              <p className="text-sm text-slate-500">{s.batch} · {s.school}</p>
             </div>
           </Link>
         ))}

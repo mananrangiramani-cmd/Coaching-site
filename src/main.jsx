@@ -4,12 +4,16 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { UserProvider } from './context/UserContext.jsx'
 import './index.css'
+import { ToastProvider } from './context/ToastContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <UserProvider>
+        <ToastProvider>
+          
         <App />
+        </ToastProvider>
       </UserProvider>
     </BrowserRouter>
   </StrictMode>

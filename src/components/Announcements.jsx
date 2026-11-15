@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Megaphone, Trash2 } from 'lucide-react'
 import { useUser } from '../context/UserContext'
 import { initialAnnouncements } from '../data/announcements'
+import { useToast } from '../context/ToastContext'
 
 const KEY = 'announcements-v1'
 const load = () => {
@@ -21,6 +22,7 @@ export default function Announcements() {
     e.preventDefault()
     if (!title.trim() || !text.trim()) return
     save([{ id: Date.now(), title: title.trim(), text: text.trim(), standard: to, date: new Date().toISOString().slice(0, 10) }, ...list])
+    toast('Announcement posted')
     setTitle(''); setText('')
   }
 
@@ -29,7 +31,7 @@ export default function Announcements() {
     .slice(0, 6)
 
   const input = 'w-full rounded-lg border border-slate-300 bg-white p-2 text-slate-900'
-
+  const toast = useToast()
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm">
       <p className="flex items-center gap-2 font-semibold text-slate-900">

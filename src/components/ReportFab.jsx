@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ClipboardCheck, X, Star } from 'lucide-react'
 import { useUser } from '../context/UserContext'
-
+import { useToast } from '../context/ToastContext'
 const KEY = 'daily-reports-v1'
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -31,6 +31,7 @@ export default function ReportFab() {
       notes: f.notes.trim(), tomorrow: f.tomorrow.trim(),
     })
     localStorage.setItem(KEY, JSON.stringify(all))
+    toast('Daily report submitted')
     setF({ subject: '', cls: '', hours: '', topics: '', rating: 0, notes: '', tomorrow: '' })
     setSent(true)
     setTimeout(() => { setSent(false); setOpen(false) }, 1400)
@@ -38,7 +39,7 @@ export default function ReportFab() {
 
   const input = 'w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 sm:p-2'
   const label = 'mb-1 mt-3 block text-sm font-medium text-slate-700'
-
+  const toast = useToast()
   return (
     <>
       <button

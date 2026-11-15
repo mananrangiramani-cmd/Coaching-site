@@ -4,6 +4,7 @@ import { useUser } from '../context/UserContext'
 import StandardSelect from '../components/StandardSelect'
 import { SUBJECTS } from '../utils/progress'
 import { putFile, getFile, removeFile } from '../utils/materialStore'
+import { useToast } from '../context/ToastContext'
 
 const KEY = 'materials-v1'
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || [] } catch { return [] } }
@@ -46,6 +47,7 @@ export default function Materials() {
         fileName: form.file?.name || '', by: name, role,
         date: new Date().toISOString().slice(0, 10),
       }, ...items])
+      toast('Material posted')
       setForm((p) => ({ ...p, title: '', link: '', file: null }))
       e.target.reset()
     } catch {
@@ -79,7 +81,7 @@ export default function Materials() {
   })
 
   const input = 'w-full rounded-lg border border-slate-300 bg-white p-2 text-slate-900'
-
+  const toast = useToast()
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">

@@ -5,6 +5,8 @@ import { tests } from '../data/tests'
 import { students } from '../data/students'
 import { useUser } from '../context/UserContext'
 import { ordinal } from '../data/standards'
+import EmptyState from '../components/EmptyState'
+import { ClipboardList } from 'lucide-react'
 import StandardSelect from '../components/StandardSelect'
 
 const standardOf = (r) => r.standard ?? students.find((s) => s.name === r.student)?.standard
@@ -144,15 +146,16 @@ export default function Results() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
         <div className="space-y-4">
-          {visible.length === 0 && (
-            <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-              <p className="text-slate-500">No results yet.</p>
+                    {visible.length === 0 && (
+            <EmptyState
+              icon={ClipboardList}
+              title="No results yet"
+              text="Once a test is taken, the score and breakdown will show up here."
+            >
               {!isStaff && (
-                <Link to="/tests" className="mt-2 inline-block font-medium text-indigo-600">
-                  Take a test
-                </Link>
+                <Link to="/tests" className="font-medium text-indigo-600">Take a test →</Link>
               )}
-            </div>
+            </EmptyState>
           )}
 
           {visible.map((r) => {

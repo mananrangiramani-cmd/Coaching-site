@@ -5,6 +5,8 @@ import { initialDoubts } from '../data/doubts'
 import { useUser } from '../context/UserContext'
 import { ordinal } from '../data/standards'
 import StudentProgress from '../components/StudentProgress'
+import GamePanel from '../components/GamePanel'
+
 function load(key, fallback) {
   try {
     const saved = localStorage.getItem(key)
@@ -144,7 +146,7 @@ export default function StudentDetail() {
           </>
         )}
       </div>
-
+      <GamePanel name={student.name} />
       <StudentProgress student={student} />
       
       <div className="rounded-2xl bg-white p-6 shadow-sm">
