@@ -36,7 +36,7 @@ export default function FloatingTools() {
   }
   const today = new Date().toLocaleDateString('en-CA')
   read('events-v1', [])
-    .filter((e) => e.date >= today && (role !== 'student' || e.standard === 'all' || Number(e.standard) === standard))
+    .filter((e) => e.date >= today && (role !== 'student' || Number(e.standard) === standard))
     .slice(0, 5)
     .forEach((e) => items.push({ id: `e-${e.id}`, text: `Class: ${e.subject} at ${e.time}`, sub: e.date, to: '/' }))
   read('announcements-v1', initialAnnouncements)

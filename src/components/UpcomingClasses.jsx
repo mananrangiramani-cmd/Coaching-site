@@ -40,10 +40,14 @@ export default function UpcomingClasses() {
   const add = (e) => {
     e.preventDefault()
     if (!form.subject.trim() || !form.date || !form.time) return
-    save([...events, {
-      id: Date.now(), date: form.date, time: fmt(form.time),
-      subject: form.subject.trim(), standard: form.cls, faculty: form.faculty,
-    }])
+        const targets = form.cls === 'all' ? [9, 10, 11, 12] : [Number(form.cls)]
+    save([
+      ...events,
+      ...targets.map((c, i) => ({
+        id: Date.now() + i, date: form.date, time: fmt(form.time),
+        subject: form.subject.trim(), standard: c, faculty: form.faculty,
+      })),
+    ])
     setForm((p) => ({ ...p, subject: '' }))
     setAdding(false)
   }
@@ -59,7 +63,7 @@ export default function UpcomingClasses() {
   // classes the admin added
   const added = events
     .filter((ev) => ev.date === dayKey)
-    .filter((ev) => isStaff || ev.standard === 'all' || Number(ev.standard) === standard)
+        .filter((ev) => isStaff || Number(ev.standard) === standard)
     .map((ev) => ({ ...ev, key: ev.id, custom: true }))
 
   const list = [...regular, ...added].sort((a, b) => mins(a.time) - mins(b.time))
